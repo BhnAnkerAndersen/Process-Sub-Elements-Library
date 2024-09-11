@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_DigitalInput" Id="{2d9db24c-512c-4126-86bf-eb1de2f76239}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_DigitalInput
+VAR_INPUT
+	eMachineState	:REFERENCE TO E_State;			//Normal Operation, Simulation, Config Mode.
+	bSignalIn_IO	AT %I*: BOOL; 					//IO Signal 
+	bSimulateIn		:BOOL;							//Simulated signal from program/HMI
+	tOnDelayIn		:TIME;							//On delay time from HMI
+	tOffDelayIn		:TIME;							//Off delay time from HMI
+END_VAR
+VAR_OUTPUT
+	bSignalRawOut	:BOOL;							//Output signal without delay
+	bSignalDelayOut	:BOOL;							//Output signal with delay
+END_VAR
+VAR
+	TONDelayOn		:TON;							//Time on delay
+	TOFDelayOff		:TOF;							//Time off delay
+	tOnDelay		:TIME;							//Time set to on delay
+	tOffDelay		:TIME;							//Time set to off delay
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[CASE eMachineState OF
+	E_State.NormalOperation:
+	
+		//If no time delays are specified, send signal out equal to signal in. 
+		IF tOnDelay = T#0S AND tOffDelay = T#0S THEN
+			bSignalRawOut := bSignalIn_IO;
+		ELSE
+			//If time delays are specified, send signal out as delayed signal in.
+			TONDelayOn(IN:=bSignalIn_IO, PT:=tOnDelay);
+			TOFDelayOff(IN:=TONDelayOn.Q, PT:=tOffDelay);
+			bSignalDelayOut := TONDelayOn.Q OR TOFDelayOff.Q;
+		END_IF
+		
+	E_State.Simulation:
+	
+		//If no time delays are specified, send simulated signal out equal to simulated signal in. 
+		IF tOnDelay = T#0S AND tOffDelay = T#0S THEN
+			bSignalRawOut := bSimulateIn;
+		ELSE
+			//If time delays are specified, send simulated signal out as delayed simulated signal in.
+			TONDelayOn(IN:=bSimulateIn, PT:=tOnDelay);
+			TOFDelayOff(IN:=TONDelayOn.Q, PT:=tOffDelay);
+			bSignalDelayOut := TONDelayOn.Q OR TOFDelayOff.Q;
+		END_IF
+		
+	E_State.ConfigMode:
+	
+		//Set delay times when machine is in config.
+		tOnDelay := tOnDelayIn;
+		tOffDelay := tOffDelayIn;
+END_CASE]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

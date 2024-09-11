@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<TcSmItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4026.6" ClassName="CNestedPlcProjDef">
+	<Project GUID="{1479E849-FA50-42F2-BAF4-D885C701AE4E}" Name="ProcessSubElements" PrjFilePath="..\..\ProcessSubElements\ProcessSubElements.plcproj" TmcFilePath="..\..\ProcessSubElements\ProcessSubElements.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
+		<Instance File="ProcessSubElements Instance.xti"/>
+	</Project>
+</TcSmItem>
